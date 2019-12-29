@@ -1,0 +1,26 @@
+{
+  "name": "noughts-and-crosses",
+  "version": "1.0.0",
+  "description": "ML experiments",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aderowbotham/noughts-and-crosses.git"
+  },
+  "keywords": [
+    "\"machine",
+    "learning\""
+  ],
+  "author": "Ade Rowbotham",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aderowbotham/noughts-and-crosses/issues"
+  },
+  "homepage": "https://github.com/aderowbotham/noughts-and-crosses#readme",
+  "dependencies": {
+    "angular": "^1.7.9"
+  }
+}
