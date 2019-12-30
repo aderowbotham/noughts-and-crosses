@@ -32,13 +32,15 @@
         </div>
 
         <div class="row game-area">
-          <div class="large-4 medium-6 small-12 columns">
+          <div class="large-5 medium-6 small-12 columns">
             <div ng-noughts-gameboard></div>
           </div>
 
-          <div class="large-4 medium-6 small-12 columns stats-panel">
+          <div class="large-7 medium-6 small-12 columns stats-panel">
             <div ng-game-status-panel>
               <h6>In development</h6>
+              <p>Inspired by <a href="https://www.mscroggs.co.uk/menace/">Matthew Scroggs’ MENACE</a>. This is my own implementation of it using the same basic principles but built from scratch as a learning exercise.</p>
+              <p>The principle here is that the computer player is somewhat separate from game engine code. The CPU player itself deals more abstractly with states and reinforcements, such that the "same" computer player can (maybe) later "learn" to play other simple games.</p>
               <p>This version is massively not that interesting yet because the computer player is not connected</p>
               <i>@NOTE The computer player is not completed. You need to take the computer's turns (X) at present</i><br><br>
               <div>{{ status.gameActive ? "Game in progress" : "Game finished" }}</div>
