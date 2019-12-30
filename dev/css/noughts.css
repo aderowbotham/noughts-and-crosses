@@ -115,3 +115,17 @@ body
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none;
 }
+
+
+@media screen and (max-width: 500px)  {
+  body
+  {
+    margin: 20px;
+  }
+
+  .reset-button
+  {
+    display: inline-block;
+    margin: 20px 0 20px 0;
+  }
+}
