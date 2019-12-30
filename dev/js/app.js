@@ -13,7 +13,12 @@
     GameState.init();
   })
 
-  .directive("ngNoughtsGameboard", function($log, constants, GameState){
+  .directive("ngNoughtsGameboard", function($log, $rootScope, constants, GameState){
+
+    function _setBoard(scope){
+        scope.squares = GameState.getSquares();
+        scope.status = GameState.getStatus();
+    }
 
     return {
       replace: true,
@@ -24,31 +29,15 @@
       link: function(scope, el) {
 
         // content of all the squares indexed 0 to 8 from top left
-        scope.squares = GameState.getSquares();
-
-        scope.status = GameState.getStatus();
-
-        // callback function passed to each square as a reference
-        // scope.clickSquare = function(squareId){
-        //   $log.debug("clicked square " + squareId);
-        //   scope.content[squareId] = "x";
-        // };
+        _setBoard(scope);
+        $rootScope.$on("resetgame", function(){
+          _setBoard(scope);
+        });
 
         scope.clickSquare = function(squareId){
-
           var currentPlayer = GameState.getCurrentPlayer();
-
           GameState.clickSquare(currentPlayer, squareId);
         };
-
-
-        scope.resetGame = function(){
-          GameState.reset();
-          scope.squares = GameState.getSquares();
-          scope.status = GameState.getStatus();
-        };
-
-
       }
     };
   })
@@ -91,10 +80,19 @@
           scope.status = GameState.getStatus();
         });
       }
+    };
+  })
 
 
+  .directive("resetButton", function($log, GameState){
+    return {
+      restrict: "C",
+      link: function(scope){
+        scope.resetGame = function(){
+          GameState.reset();
+        };
 
-
+      }
     };
   });
 

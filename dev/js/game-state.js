@@ -102,9 +102,9 @@
 
 
     function reset(){
-      $log.debug("reset")
       self = {
         turn: constants.PLAYER_COMPUTER,
+        turnSymbol: _getSymbolForPlayer(constants.PLAYER_COMPUTER),
         squares: [{val: null, win: false}, {val: null, win: false}, {val: null, win: false}, {val: null, win: false}, {val: null, win: false}, {val: null, win: false}, {val: null, win: false}, {val: null, win: false}, {val: null, win: false}],
         winner: null,
         gameActive: true
@@ -144,6 +144,7 @@
 
       // toggle whose turn it is if the game is active, or set the turn to null
       self.turn = self.gameActive ? ((self.turn === constants.PLAYER_COMPUTER) ? constants.PLAYER_HUMAN : constants.PLAYER_COMPUTER) : null;
+      self.turnSymbol  = _getSymbolForPlayer(self.turn);
 
     }
 
