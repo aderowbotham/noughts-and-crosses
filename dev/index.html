@@ -4,13 +4,23 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
   <meta http-equiv="x-ua-compatible" content="IE=edge">
-  <meta name="description" content="">
+  <meta name="description" content="Noughts and Crosses machine learning experiment">
   <meta name="author" content="Ade Rowbotham">
   <title>Noughts and Crosses</title>
 
   <link href="node_modules/foundation-sites/dist/css/foundation.min.css" rel="stylesheet">
   <link href="node_modules/foundation-sites/dist/css/foundation-float.css" rel="stylesheet">
-  <link href="css/noughts.css" rel="stylesheet">
+  <link href="css/noughts.css?r=2" rel="stylesheet">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-188815-26"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-188815-26');
+</script>
 
 
 </head>
@@ -36,18 +46,21 @@
             <div ng-noughts-gameboard></div>
           </div>
 
-          <div class="large-7 medium-6 small-12 columns stats-panel">
-            <div ng-game-status-panel>
-              <h6>In development</h6>
-              <p>Inspired by <a href="https://www.mscroggs.co.uk/menace/">Matthew Scroggs’ MENACE</a>. This is my own implementation of it using the same basic principles but built from scratch as a learning exercise.</p>
-              <p>The principle here is that the computer player is somewhat separate from game engine code. The CPU player itself deals more abstractly with states and reinforcements, such that the "same" computer player can (maybe) later "learn" to play other simple games.</p>
-              <p>This version is massively not that interesting yet because the computer player is not connected</p>
-              <i>@NOTE The computer player is not completed. You need to take the computer's turns (X) at present</i><br><br>
+          <div class="large-7 medium-6 small-12 columns">
+            <h6>In development</h6>
+            <p>Inspired by <a href="https://www.mscroggs.co.uk/menace/">Matthew Scroggs’ MENACE</a>. This is my own implementation of it using the same basic principles but built from scratch as a learning exercise.</p>
+            <p>The principle here is that the computer player is somewhat separate from game engine code. The CPU player itself deals more abstractly with states and reinforcements, such that the "same" computer player can (maybe) later "learn" to play other simple games.</p>
+            <p>This version is massively not that interesting yet because the computer player is not connected</p>
+            <i>@NOTE The computer player is not completed. You need to take the computer's turns (X) at present</i><br><br>
+
+            <div ng-game-status-panel class="stats-panel">
               <div>{{ status.gameActive ? "Game in progress" : "Game finished" }}</div>
               <div ng-show="status.gameActive">Turn: {{ status.turn }} ({{ status.turnSymbol.toUpperCase() }})</div>
               <div class="winner" ng-show="status.winner">{{ status.winner }} is the winner</div>
               <div class="winner" ng-show="!status.winner && !status.gameActive">It was a draw</div>
             </div>
+
+            <p><a href="https://github.com/aderowbotham/noughts-and-crosses">Source on GitHub</a></p>
 
           </div>
         </div>

@@ -1,6 +1,6 @@
 body
 {
-  background: #444;
+  background: #333;
   color: #eee;
   font-family: monospace;
   margin: 50px;
@@ -99,6 +99,11 @@ body
   border-left: 1px solid #eee;
 }
 
+.stats-panel
+{
+  background: #000;
+  padding: 9px 14px;
+}
 
 .stats-panel .winner
 {
