@@ -1,20 +1,26 @@
 <div class="gameboard" ng-on-resize="onPanelResize">
 
   <div class="row top-row">
-    <div ng-game-square="0" ng-val="content[0]" callback="clickSquare"></div>
-    <div ng-game-square="1" ng-val="content[1]" callback="clickSquare"></div>
-    <div ng-game-square="2" ng-val="content[2]" callback="clickSquare"></div>
+    <div ng-game-square="0" ng-data="squares[0]" ng-status="status" callback="clickSquare"></div>
+    <div ng-game-square="1" ng-data="squares[1]" ng-status="status" callback="clickSquare"></div>
+    <div ng-game-square="2" ng-data="squares[2]" ng-status="status" callback="clickSquare"></div>
   </div>
 
   <div class="row middle-row">
-    <div ng-game-square="3" ng-val="content[3]" callback="clickSquare"></div>
-    <div ng-game-square="4" ng-val="content[4]" callback="clickSquare"></div>
-    <div ng-game-square="5" ng-val="content[5]" callback="clickSquare"></div>
+    <div ng-game-square="3" ng-data="squares[3]" ng-status="status" callback="clickSquare"></div>
+    <div ng-game-square="4" ng-data="squares[4]" ng-status="status" callback="clickSquare"></div>
+    <div ng-game-square="5" ng-data="squares[5]" ng-status="status" callback="clickSquare"></div>
   </div>
 
   <div class="row bottom-row">
-    <div ng-game-square="6" ng-val="content[6]" callback="clickSquare"></div>
-    <div ng-game-square="7" ng-val="content[7]" callback="clickSquare"></div>
-    <div ng-game-square="8" ng-val="content[8]" callback="clickSquare"></div>
+    <div ng-game-square="6" ng-data="squares[6]" ng-status="status" callback="clickSquare"></div>
+    <div ng-game-square="7" ng-data="squares[7]" ng-status="status" callback="clickSquare"></div>
+    <div ng-game-square="8" ng-data="squares[8]" ng-status="status" callback="clickSquare"></div>
+  </div>
+
+  <div class="row button-container">
+    <div class="small-12 columns">
+      <button class="button reset-button" type="button" ng-click="resetGame()">New game</button>
+    </div>
   </div>
 </div>

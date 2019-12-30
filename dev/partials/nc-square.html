@@ -1,7 +1,7 @@
 <div class="small-4 columns square">
-  <a class="button">
+  <a class="button" ng-click="click()" ng-class="{ active: !data.val && status.turn === 'Human', win: data.win===true}">
     <div class="table">
-      <div class="table-cell" ng-bind="symbol" ng-click="click()"></div>
+      <div class="table-cell" ng-bind="data.val"></div>
     </div>
   </a>
 </div>

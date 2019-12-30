@@ -28,8 +28,14 @@
             <div ng-noughts-gameboard></div>
           </div>
 
-          <div class="large-4 medium-6 small-12 columns">
-            stats
+          <div class="large-4 medium-6 small-12 columns stats-panel">
+            <div ng-game-status-panel>
+              <div>{{ status.gameActive ? "Game in progress" : "Game finished" }}</div>
+              <div ng-show="status.gameActive">Turn: {{ status.turn }}</div>
+              <div ng-show="status.winner">{{ status.winner }} is the winner</div>
+              <div ng-show="!status.winner && !status.gameActive">It was a draw</div>
+            </div>
+
           </div>
         </div>
 
@@ -44,6 +50,8 @@
 <script src="node_modules/angular/angular.js"></script>
 
 <script src="js/app.js"></script>
+<script src="js/constants.js"></script>
+<script src="js/game-state.js"></script>
 
 
 </body>
