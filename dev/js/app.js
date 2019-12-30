@@ -9,21 +9,26 @@
     $logProvider.debugEnabled(true);
   })
 
-  .constant("FOO", "bar")
+  // .constant("FOO", "bar")
 
-  .directive("ngNoughts", function($log, FOO){
+  .directive("ngNoughtsGameboard", function($log){
 
     return {
       restrict: "A",
+      scope: {},
+      templateUrl: "partials/nc-board.html",
 
-      link: function(scope) {
-        $log.debug("linked ngNoughts directive");
 
-        scope.test = "test var FOO = " + FOO;
+      link: function(scope, el) {
+
+        scope.onResize = function(){
+          scopeRef.containerHeight = $(".buy-panel").outerHeight(true);
+        };
+
+        // scope.test = "test var FOO = " + FOO;
       }
 
     };
 
   });
-
 }());

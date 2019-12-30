@@ -8,20 +8,39 @@
   <meta name="author" content="Ade Rowbotham">
   <title>Noughts and Crosses</title>
 
-  <!-- <link href="/css/all.min.css?r=384" rel="stylesheet"> -->
+  <link href="node_modules/foundation-sites/dist/css/foundation.min.css" rel="stylesheet">
+  <link href="node_modules/foundation-sites/dist/css/foundation-float.css" rel="stylesheet">
+  <link href="css/noughts.css" rel="stylesheet">
+
+
 </head>
 <body>
 
   <div class="row">
     <div class="large-12 columns">
 
-      <div ng-app="noughts" ng-noughts class="ng-cloak">
-        Content {{ test }}
+      <div ng-app="noughts" class="ng-cloak">
+
+        <h6>Noughts and Crosses</h6>
+
+        <div class="row game-area">
+          <div class="large-4 medium-6 small-12 columns">
+            <div ng-noughts-gameboard></div>
+          </div>
+
+          <div class="large-4 medium-6 small-12 columns">
+            stats
+          </div>
+        </div>
+
+
+
       </div>
 
     </div>
   </div>
 
+<script src="node_modules/jquery/dist/jquery.slim.min.js"></script>
 <script src="node_modules/angular/angular.js"></script>
 
 <script src="js/app.js"></script>
