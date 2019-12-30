@@ -36,7 +36,7 @@
 
         scope.clickSquare = function(squareId){
           var currentPlayer = GameState.getCurrentPlayer();
-          GameState.clickSquare(currentPlayer, squareId);
+          GameState.playInSquare(currentPlayer, squareId);
         };
       }
     };
@@ -94,6 +94,16 @@
 
       }
     };
+  });
+
+
+  angular.module("constants", [])
+  .constant("ERRORS", {
+    FOO: "error_foo"
+  })
+  .constant("constants", {
+    PLAYER_HUMAN: "Human",
+    PLAYER_COMPUTER: "Computer"
   });
 
 

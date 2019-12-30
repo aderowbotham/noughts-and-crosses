@@ -7,18 +7,32 @@
   .factory("GameState", function($log, $rootScope, constants) {
 
     var self;
-    var symbols = {
+    var players = {
       o: constants.PLAYER_HUMAN,
       x: constants.PLAYER_COMPUTER
     };
 
 
 
-    // symbols object uses symbols as the key
+    function reset(){
+      self = {
+        turn: constants.PLAYER_COMPUTER,
+        turnSymbol: _getSymbolForPlayer(constants.PLAYER_COMPUTER),
+        squares: [{val: null, win: false}, {val: null, win: false}, {val: null, win: false}, {val: null, win: false}, {val: null, win: false}, {val: null, win: false}, {val: null, win: false}, {val: null, win: false}, {val: null, win: false}],
+        winner: null,
+        gameActive: true
+      };
+
+      $rootScope.$broadcast("resetgame");
+    }
+
+
+
+    // players object uses the players' symbols ('x' or 'o') as the key
     // find the matching value and then return the corresponding key
     function _getSymbolForPlayer(playerType){
-      for (var key in symbols) {
-        if (symbols.hasOwnProperty(key) && symbols[key] === playerType) {
+      for (var key in players) {
+        if (players.hasOwnProperty(key) && players[key] === playerType) {
           return key;
         }
       }
@@ -42,6 +56,7 @@
 
 
 
+    // check any set of three squares (pass horizontal, vertical or diagonal lines)
     function _checkLine(ids){
       var squares = self.squares;
       // if the first value is not null and all are the same then there is a winning row
@@ -68,7 +83,7 @@
           self.squares[rows[row][0]].win = true;
           self.squares[rows[row][1]].win = true;
           self.squares[rows[row][2]].win = true;
-          return symbols[matching];
+          return players[matching];
         }
       }
 
@@ -81,7 +96,7 @@
           self.squares[cols[col][0]].win = true;
           self.squares[cols[col][1]].win = true;
           self.squares[cols[col][2]].win = true;
-          return symbols[matching];
+          return players[matching];
         }
       }
 
@@ -93,7 +108,7 @@
           self.squares[diags[diag][0]].win = true;
           self.squares[diags[diag][1]].win = true;
           self.squares[diags[diag][2]].win = true;
-          return symbols[matching];
+          return players[matching];
         }
       }
 
@@ -101,25 +116,14 @@
     }
 
 
-    function reset(){
-      self = {
-        turn: constants.PLAYER_COMPUTER,
-        turnSymbol: _getSymbolForPlayer(constants.PLAYER_COMPUTER),
-        squares: [{val: null, win: false}, {val: null, win: false}, {val: null, win: false}, {val: null, win: false}, {val: null, win: false}, {val: null, win: false}, {val: null, win: false}, {val: null, win: false}, {val: null, win: false}],
-        winner: null,
-        gameActive: true
-      };
-
-      $rootScope.$broadcast("resetgame");
-    }
-
 
     function init(){
       reset();
     }
 
 
-    function clickSquare(playerType, squareId){
+
+    function playInSquare(playerType, squareId){
 
       if(!self.gameActive){
         return;
@@ -150,11 +154,8 @@
 
 
 
-
-
-
     return {
-      clickSquare: clickSquare,
+      playInSquare: playInSquare,
       init: init,
       getCurrentPlayer: function(){
         return self.turn;
@@ -166,10 +167,7 @@
         return self;
       },
       reset: reset
-
-
     };
-
   });
 
 
