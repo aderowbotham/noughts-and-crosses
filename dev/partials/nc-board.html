@@ -1,74 +1,20 @@
-<div id="game-board" class="gameboard" ng-on-resize="onPanelResize">
+<div class="gameboard" ng-on-resize="onPanelResize">
 
   <div class="row top-row">
-    <div class="small-4 columns square">
-      <a class="button">
-        <div class="table">
-            <div class="table-cell">x</div>
-        </div>
-      </a>
-    </div>
-    <div class="small-4 columns square">
-      <a class="button">
-        <div class="table">
-            <div class="table-cell">o</div>
-        </div>
-      </a>
-    </div>
-    <div class="small-4 columns square">
-      <a class="button">
-        <div class="table">
-            <div class="table-cell">x</div>
-        </div>
-      </a>
-    </div>
+    <div ng-game-square="0" ng-val="content[0]" callback="clickSquare"></div>
+    <div ng-game-square="1" ng-val="content[1]" callback="clickSquare"></div>
+    <div ng-game-square="2" ng-val="content[2]" callback="clickSquare"></div>
   </div>
 
   <div class="row middle-row">
-    <div class="small-4 columns square">
-      <a class="button">
-        <div class="table">
-            <div class="table-cell">o</div>
-        </div>
-      </a>
-    </div>
-    <div class="small-4 columns square">
-      <a class="button">
-        <div class="table">
-            <div class="table-cell">x</div>
-        </div>
-      </a>
-    </div>
-    <div class="small-4 columns square">
-      <a class="button">
-        <div class="table">
-            <div class="table-cell">o</div>
-        </div>
-      </a>
-    </div>
+    <div ng-game-square="3" ng-val="content[3]" callback="clickSquare"></div>
+    <div ng-game-square="4" ng-val="content[4]" callback="clickSquare"></div>
+    <div ng-game-square="5" ng-val="content[5]" callback="clickSquare"></div>
   </div>
 
   <div class="row bottom-row">
-    <div class="small-4 columns square">
-      <a class="button">
-        <div class="table">
-            <div class="table-cell">x</div>
-        </div>
-      </a>
-    </div>
-    <div class="small-4 columns square">
-      <a class="button">
-        <div class="table">
-            <div class="table-cell">o</div>
-        </div>
-      </a>
-    </div>
-    <div class="small-4 columns square">
-      <a class="button">
-        <div class="table">
-            <div class="table-cell">x</div>
-        </div>
-      </a>
-    </div>
+    <div ng-game-square="6" ng-val="content[6]" callback="clickSquare"></div>
+    <div ng-game-square="7" ng-val="content[7]" callback="clickSquare"></div>
+    <div ng-game-square="8" ng-val="content[8]" callback="clickSquare"></div>
   </div>
 </div>

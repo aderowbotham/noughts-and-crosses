@@ -9,26 +9,55 @@
     $logProvider.debugEnabled(true);
   })
 
-  // .constant("FOO", "bar")
 
   .directive("ngNoughtsGameboard", function($log){
 
     return {
+      replace: true,
       restrict: "A",
       scope: {},
       templateUrl: "partials/nc-board.html",
 
-
       link: function(scope, el) {
 
-        scope.onResize = function(){
-          scopeRef.containerHeight = $(".buy-panel").outerHeight(true);
+        // content of all the squares indexed 0 to 8 from top left
+        scope.content = [null, null, null, null, null, null, null, null, null];
+
+        // callback function passed to each square as a reference
+        scope.clickSquare = function(squareId){
+          $log.debug("clicked square " + squareId);
+          scope.content[squareId] = "x";
         };
-
-        // scope.test = "test var FOO = " + FOO;
       }
-
     };
+  })
 
+
+  .directive("ngGameSquare", function($log){
+
+    return {
+      replace: true,
+      restrict: "A",
+      scope: {
+        squareId: "@ngGameSquare",
+        symbol: "=ngVal",
+        callback: "="
+      },
+      templateUrl: "partials/nc-square.html",
+      link: function(scope, el) {
+
+        // ensure attribute is stored as a number
+        scope.squareId = parseInt(scope.squareId);
+
+        // call callback function passing the ID
+        scope.click = function(){
+          scope.callback(scope.squareId);
+        };
+      }
+    };
   });
+
+
+
+
 }());
