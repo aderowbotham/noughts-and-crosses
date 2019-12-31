@@ -110,6 +110,11 @@ body
   color: #ff0;
 }
 
+.button.hard-reset-button
+{
+  margin: 0;
+}
+
 /* angular */
 [ng-click],
 [data-ng-click],
@@ -122,15 +127,20 @@ body
 }
 
 
-@media screen and (max-width: 500px)  {
+@media screen and (max-width: 639px)  {
   body
   {
     margin: 25px;
   }
 
-  .reset-button
+  .reset-button, .button.hard-reset-button
   {
     display: inline-block;
-    margin: 20px 0 20px 0;
+    margin: 40px 0 20px 0;
+  }
+
+  .button.hard-reset-button
+  {
+    margin-top: 53px;
   }
 }

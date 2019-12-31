@@ -16,6 +16,6 @@ use `npm install` to install dependencies
 
 ### To-do
 
+- ~~Save state in browser local storage for persistence, and add a hard reset button.~~ 
 - Check for rotations and reflections in state history
-- Save state in browser local storage for persistence, and add a hard reset button.
 - (possibly) Add option to save state on the server with unique URL, for sharing / recall (would require API and database setup, possibly not worth it)

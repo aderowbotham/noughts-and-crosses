@@ -4,21 +4,51 @@
 
   angular.module("noughts")
 
-  .factory("GameState", function($log, $rootScope, constants) {
+  .factory("GameState", function($log, $rootScope, constants, localStorageService) {
 
-    var self = {
-      gameCounter: 0,
-      allGamesOutcome: [],
-      computerWins: 0,
-      humanWins: 0,
-      draws: 0
-    };
-    var game;
-    var players = {
+    var self,
+    stateStorageId,
+    game,
+    players = {
       o: constants.PLAYER_HUMAN,
       x: constants.PLAYER_COMPUTER
     };
 
+
+    function init(gameId){
+      stateStorageId = gameId + ".gamestate";
+
+      if(localStorageService.get(stateStorageId)){
+        self = localStorageService.get(stateStorageId);
+      } else {
+        self = {
+          gameCounter: 0,
+          allGamesOutcome: [],
+          computerWins: 0,
+          humanWins: 0,
+          draws: 0
+        };
+        localStorageService.set(stateStorageId, self);
+      }
+
+      reset();
+    }
+
+
+    function hardReset(){
+
+      self = {
+        gameCounter: 0,
+        allGamesOutcome: [],
+        computerWins: 0,
+        humanWins: 0,
+        draws: 0
+      };
+      localStorageService.set(stateStorageId, self);
+      $rootScope.$broadcast("hard_reset");
+
+      reset();
+    }
 
 
     function reset(){
@@ -31,7 +61,7 @@
       };
 
       self.gameCounter ++;
-      $rootScope.$broadcast("resetgame");
+      $rootScope.$broadcast("reset_game");
     }
 
 
@@ -148,8 +178,6 @@
       game.winner = _checkForWinner();
       game.gameActive = _getIsGameActive();
 
-
-
       // toggle whose turn it is if the game is active, or set the turn to null
       game.turn = game.gameActive ? ((game.turn === constants.PLAYER_COMPUTER) ? constants.PLAYER_HUMAN : constants.PLAYER_COMPUTER) : null;
       game.turnSymbol  = _getSymbolForPlayer(game.turn);
@@ -166,15 +194,11 @@
           self.draws ++;
         }
 
+        localStorageService.set(stateStorageId, self);
+
       }
 
     }
-
-
-    function init(){
-      reset();
-    }
-
 
 
     return {
@@ -192,7 +216,8 @@
       getStatus: function(){
         return self;
       },
-      reset: reset
+      reset: reset,
+      hardReset: hardReset
     };
   });
 

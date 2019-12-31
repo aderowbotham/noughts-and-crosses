@@ -4,23 +4,24 @@
 
   angular.module("mlengine", ["constants"])
 
-  .factory("ComputerPlayer", function($timeout, $log, $rootScope, constants) {
+  .factory("ComputerPlayer", function($timeout, $log, $rootScope, $window, constants, localStorageService) {
 
-    var self,
-    gameStateRef,
-    thisGameHistory = [],
-    allHistory = {};
+    var gameStateRef,
+      thisGameHistory = [],
+      allHistory,
+      historyStorageId;
 
     var settings = {
       startingMoves: 5, // equivalent to number of coloured beads per possible move in each matchbox
       winReward: 4,
       loseReward: -2,
       drawReward: 1,
-      useGridRotations: false,
+      checkEquivalents: false,
     };
 
-    function init(_gameStateRef, _settingsOverride){
+    function init(_gameStateRef, _settingsOverride, gameId){
       gameStateRef = _gameStateRef;
+      historyStorageId = gameId + ".allHistory";
 
       // if settings passed then overwrite the defauls
       if(_settingsOverride){
@@ -31,12 +32,27 @@
         }
       }
 
+      if(localStorageService.get(historyStorageId)){
+        allHistory = localStorageService.get(historyStorageId);
+      } else {
+        allHistory = {};
+        localStorageService.set(historyStorageId, allHistory);
+      }
+
       $rootScope.$on("turn_notify", _onTurnNotify);
       $rootScope.$on("game_end_event", _onGameEnd);
-      $rootScope.$on("resetgame", function(){
+      $rootScope.$on("hard_reset", _onHardReset);
+      $rootScope.$on("reset_game", function(){
         thisGameHistory = [];
       });
+    }
 
+
+    function _onHardReset(){
+
+      allHistory = {};
+      localStorageService.set(historyStorageId, allHistory);
+      $window.alert("Computer player reset to beginner");
     }
 
 
@@ -70,6 +86,7 @@
         delete move.available;
         // copy to the more permanent history
         allHistory[stateKey] = angular.copy(move);
+        localStorageService.set(historyStorageId, allHistory);
       });
 
       // $log.debug("allHistory:", allHistory);
@@ -130,8 +147,8 @@
 
       var output = {};
 
-      if(settings.useGridRotations){
-        throw("useGridRotations not implemented");
+      if(settings.checkEquivalents){
+        throw("checkEquivalents not implemented");
         // for each grid rotation check if allHistory[_that_state_key_] exists
       } else {
         output.stateKey = board.join("");

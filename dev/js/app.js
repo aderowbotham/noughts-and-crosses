@@ -2,7 +2,7 @@
 
   "use strict";
 
-  angular.module("noughts", ["constants", "mlengine"])
+  angular.module("noughts", ["constants", "mlengine", "LocalStorageModule"])
 
 
 
@@ -14,8 +14,8 @@
 
 
   .run(function($log, $rootScope, GameState, ComputerPlayer){
-    GameState.init();
-    ComputerPlayer.init(GameState, { startingScores: 10 });
+    GameState.init("noughts_v1");
+    ComputerPlayer.init(GameState, { startingScores: 10 }, "noughts_v1");
 
     // notify the computer that it's its turn
     $rootScope.$broadcast("turn_notify", {turn: GameState.getGameStatus().turn});
@@ -40,7 +40,7 @@
 
         // content of all the squares indexed 0 to 8 from top left
         _setBoard(scope);
-        $rootScope.$on("resetgame", function(){
+        $rootScope.$on("reset_game", function(){
           _setBoard(scope);
           $rootScope.$broadcast("turn_notify", {turn: GameState.getGameStatus().turn});
         });
@@ -100,7 +100,7 @@
         scope.game = GameState.getGameStatus();
         scope.status = GameState.getStatus();
 
-        $rootScope.$on("resetgame", function(){
+        $rootScope.$on("reset_game", function(){
           scope.game = GameState.getGameStatus();
           scope.status = GameState.getStatus();
         });
@@ -115,6 +115,20 @@
       link: function(scope){
         scope.resetGame = function(){
           GameState.reset();
+        };
+
+      }
+    };
+  })
+
+  .directive("hardResetButton", function($log, $window, GameState){
+    return {
+      restrict: "C",
+      link: function(scope){
+        scope.hardResetGame = function(){
+          if($window.confirm("Are you sure you want to reset the memory?")){
+            GameState.hardReset();
+          }
         };
 
       }
