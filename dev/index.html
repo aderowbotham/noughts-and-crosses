@@ -10,7 +10,7 @@
 
   <link href="node_modules/foundation-sites/dist/css/foundation.min.css" rel="stylesheet">
   <link href="node_modules/foundation-sites/dist/css/foundation-float.css" rel="stylesheet">
-  <link href="css/noughts.css?r=3" rel="stylesheet">
+  <link href="css/noughts.css?r=4" rel="stylesheet">
 
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-188815-26"></script>
   <script>
@@ -43,10 +43,6 @@
           <div class="large-7 medium-6 small-12 columns">
             <button class="button reset-button" type="button" ng-click="resetGame()">New game</button>
 
-            <p>Inspired by <a href="https://www.mscroggs.co.uk/menace/">Matthew Scroggs’ MENACE</a>. This is my own implementation of it using the same basic principles but built from scratch as a learning exercise.</p>
-            <p>Unlike MENACE We don’t pre-fill matchboxes; rather, on encountering a board state we then look if it has been seen before otherwise we then see the box with its starting state.</p>
-            <p><em>@TODO</em> We don't yet look for rotations or mirror images, so learning is slow.</p>
-
             <div ng-game-status-panel class="stats-panel">
               <div>Games {{ status.allGamesOutcome.length }} (Human {{ status.humanWins }}, Computer {{ status.computerWins }}, draw {{ status.draws }} )</div>
               <div>{{ game.gameActive ? "Game in progress" : "Game finished" }}</div>
@@ -54,6 +50,10 @@
               <div class="winner" ng-show="game.winner">{{ game.winner }} is the winner</div>
               <div class="winner" ng-show="!game.winner && !game.gameActive">It was a draw</div>
             </div>
+
+            <p>Inspired by <a href="https://www.mscroggs.co.uk/menace/">Matthew Scroggs’ MENACE</a>. This is my own implementation of it using the same basic principles but built from scratch as a learning exercise.</p>
+            <p>Unlike MENACE We don’t pre-fill matchboxes; rather, on encountering a board state we then look if it has been seen before otherwise we then see the box with its starting state.</p>
+            <p><em>@TODO</em> We don't yet look for rotations or mirror images, so learning is slow.</p>
 
           </div>
         </div>

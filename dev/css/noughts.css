@@ -103,6 +103,7 @@ body
 {
   background: #000;
   padding: 9px 14px;
+  margin-bottom: 15px !important;
 }
 
 .stats-panel .winner
@@ -125,7 +126,7 @@ body
 @media screen and (max-width: 500px)  {
   body
   {
-    margin: 20px;
+    margin: 25px;
   }
 
   .reset-button
