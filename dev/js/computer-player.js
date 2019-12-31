@@ -72,7 +72,7 @@
         allHistory[stateKey] = angular.copy(move);
       });
 
-      $log.debug("allHistory:", allHistory);
+      // $log.debug("allHistory:", allHistory);
 
     }
 
@@ -111,6 +111,11 @@
 
         var myMoveObject = _getMoveAsObject(board, available);
 
+        // catch situation where computer cannot move
+        if(myMoveObject.positionId === null){
+          return $log.warn("Computer cannot move");
+        }
+
         thisGameHistory.push(myMoveObject);
         positionId = myMoveObject.positionId;
 
@@ -137,7 +142,16 @@
         }
       }
 
-      output.positionId =_getPositionFromWeighting(output.moveWeighting);
+      output.positionId =_choosePositionFromWeighting(output.moveWeighting);
+
+      // if all move weightings reached zero no position would be available
+      // so in this case we reset this state
+      if(output.positionId === null){
+        $log.warn("History for this state reached a 'no moves available' state so was reset");
+        output.moveWeighting = _makeNewMoveWeighting(available);
+        output.positionId =_choosePositionFromWeighting(output.moveWeighting);
+      }
+
       output.available = available;
       return output;
     }
@@ -154,7 +168,7 @@
     }
 
 
-    function _getPositionFromWeighting(moveWeighting){
+    function _choosePositionFromWeighting(moveWeighting){
 
       // get the total length of chances array needed
       var chanceCount = 0;
@@ -181,6 +195,10 @@
 
       $log.debug("moveWeighting = ",moveWeighting);
       // $log.debug("allChances = ",allChances)
+
+      if(!allChances.length){
+        return null;
+      }
 
       // pick a random value from, the allChances array
       // (this array can now be discarded)
