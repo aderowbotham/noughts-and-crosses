@@ -13,7 +13,7 @@
     allHistory = {};
 
     var settings = {
-      startingMoves: 5, // total number of weighting states distributed between all options, e.g. two options with equal weight would be 50,50
+      startingMoves: 5, // equivalent to number of coloured beads per possible move in each matchbox
       winReward: 4,
       loseReward: -2,
       drawReward: 1,
