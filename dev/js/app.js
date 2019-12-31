@@ -70,6 +70,19 @@
         // ensure attribute is stored as a number
         scope.squareId = parseInt(scope.squareId);
 
+        scope.displayVal = "";
+
+        scope.$watch("data", function(nv){
+
+          scope.displayVal = "";
+          if(nv.val === "x"){
+            scope.displayVal = "✕";
+          } else if(nv.val === "o"){
+            scope.displayVal = "◯";
+          }
+
+        }, true);
+
         // call callback function passing the ID
         scope.click = function(){
           scope.callback(scope.squareId);
