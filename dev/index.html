@@ -44,7 +44,7 @@
             <button class="button reset-button" type="button" ng-click="resetGame()">New game</button>
 
             <div ng-game-status-panel class="stats-panel">
-              <div>Games {{ status.allGamesOutcome.length }} (Human {{ status.humanWins }}, Computer {{ status.computerWins }}, draw {{ status.draws }} )</div>
+              <div>Games {{ status.allGamesOutcome.length }} (Human {{ status.humanWins }}, Computer {{ status.computerWins }}, draw {{ status.draws }})</div>
               <div>{{ game.gameActive ? "Game in progress" : "Game finished" }}</div>
               <div ng-show="game.gameActive">Turn: {{ game.turn }} ({{ game.turnSymbol.toUpperCase() }})</div>
               <div class="winner" ng-show="game.winner">{{ game.winner }} is the winner</div>
