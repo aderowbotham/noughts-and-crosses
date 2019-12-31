@@ -8,7 +8,6 @@
 
     var self,
     gameStateRef,
-    moveNumber = 1,
     thisGameHistory = [],
     allHistory = {};
 
