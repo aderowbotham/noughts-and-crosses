@@ -6,7 +6,14 @@
 
   .factory("GameState", function($log, $rootScope, constants) {
 
-    var self;
+    var self = {
+      gameCounter: 0,
+      allGamesOutcome: [],
+      computerWins: 0,
+      humanWins: 0,
+      draws: 0
+    };
+    var game;
     var players = {
       o: constants.PLAYER_HUMAN,
       x: constants.PLAYER_COMPUTER
@@ -15,14 +22,15 @@
 
 
     function reset(){
-      self = {
+      game = {
         turn: constants.PLAYER_COMPUTER,
         turnSymbol: _getSymbolForPlayer(constants.PLAYER_COMPUTER),
-        squares: [{val: null, win: false}, {val: null, win: false}, {val: null, win: false}, {val: null, win: false}, {val: null, win: false}, {val: null, win: false}, {val: null, win: false}, {val: null, win: false}, {val: null, win: false}],
+        squares: [{val: 0, win: false}, {val: 0, win: false}, {val: 0, win: false}, {val: 0, win: false}, {val: 0, win: false}, {val: 0, win: false}, {val: 0, win: false}, {val: 0, win: false}, {val: 0, win: false}],
         winner: null,
         gameActive: true
       };
 
+      self.gameCounter ++;
       $rootScope.$broadcast("resetgame");
     }
 
@@ -36,18 +44,18 @@
           return key;
         }
       }
-      // error state, should never happen
-      return "?";
+      // return blank for a draw (neither player matched)
+      return "";
     }
 
 
 
     function _getIsGameActive(){
-      if(self.winner){
+      if(game.winner){
         return false;
       }
-      for(var i = 0; i  < self.squares.length; i++){
-        if(self.squares[i].val === null){
+      for(var i = 0; i  < game.squares.length; i++){
+        if(game.squares[i].val === 0){
           return true;
         }
       }
@@ -58,9 +66,9 @@
 
     // check any set of three squares (pass horizontal, vertical or diagonal lines)
     function _checkLine(ids){
-      var squares = self.squares;
-      // if the first value is not null and all are the same then there is a winning row
-      if(squares[ids[0]].val !== null && squares[ids[0]].val === squares[ids[1]].val && squares[ids[1]].val === squares[ids[2]].val){
+      var squares = game.squares;
+      // if the first value is not zero and all are the same then there is a winning row
+      if(squares[ids[0]].val !== 0 && squares[ids[0]].val === squares[ids[1]].val && squares[ids[1]].val === squares[ids[2]].val){
 
         // return 'x' or 'o'
         return squares[ids[0]].val;
@@ -73,17 +81,17 @@
 
     function _checkForWinner(){
 
-      var matching;
+      var winningSymbol;
 
       // check rows
       var rows = [[0, 1, 2], [3, 4, 5], [6, 7, 8]];
       for(var row = 0; row < 3; row++){
-        matching = _checkLine(rows[row]);
-        if(matching){
-          self.squares[rows[row][0]].win = true;
-          self.squares[rows[row][1]].win = true;
-          self.squares[rows[row][2]].win = true;
-          return players[matching];
+        winningSymbol = _checkLine(rows[row]);
+        if(winningSymbol){
+          game.squares[rows[row][0]].win = true;
+          game.squares[rows[row][1]].win = true;
+          game.squares[rows[row][2]].win = true;
+          return players[winningSymbol];
         }
       }
 
@@ -91,24 +99,24 @@
       // check columns
       var cols = [[0, 3, 6], [1, 4, 7], [2, 5, 8]];
       for(var col = 0; col < 3; col++){
-        matching = _checkLine(cols[col]);
-        if(matching){
-          self.squares[cols[col][0]].win = true;
-          self.squares[cols[col][1]].win = true;
-          self.squares[cols[col][2]].win = true;
-          return players[matching];
+        winningSymbol = _checkLine(cols[col]);
+        if(winningSymbol){
+          game.squares[cols[col][0]].win = true;
+          game.squares[cols[col][1]].win = true;
+          game.squares[cols[col][2]].win = true;
+          return players[winningSymbol];
         }
       }
 
       // check diagonals
       var diags = [[0, 4, 8], [2, 4, 6]];
       for(var diag = 0; diag < 2; diag++){
-        matching = _checkLine(diags[diag]);
-        if(matching){
-          self.squares[diags[diag][0]].win = true;
-          self.squares[diags[diag][1]].win = true;
-          self.squares[diags[diag][2]].win = true;
-          return players[matching];
+        winningSymbol = _checkLine(diags[diag]);
+        if(winningSymbol){
+          game.squares[diags[diag][0]].win = true;
+          game.squares[diags[diag][1]].win = true;
+          game.squares[diags[diag][2]].win = true;
+          return players[winningSymbol];
         }
       }
 
@@ -117,39 +125,54 @@
 
 
 
-    function init(){
-      reset();
-    }
-
-
 
     function playInSquare(playerType, squareId){
 
-      if(!self.gameActive){
+      if(!game.gameActive){
         return;
       }
 
-      if(playerType !== self.turn){
+      if(playerType !== game.turn){
         return $log.warn("It is not " + playerType + "'s turn");
       }
 
-      if(self.squares[squareId].val){
-        return $log.warn("That position is taken");
+      if(game.squares[squareId].val){
+        $rootScope.$broadcast("turn_notify", {turn: game.turn});
+        return $log.warn("That position (" + squareId + ") is taken");
       }
-
-      $log.debug(playerType + " clicked square " + squareId);
 
       var symbol = _getSymbolForPlayer(playerType);
 
-      self.squares[squareId].val = symbol;
+      game.squares[squareId].val = symbol;
 
-      self.winner = _checkForWinner();
-      self.gameActive = _getIsGameActive();
+      game.winner = _checkForWinner();
+      game.gameActive = _getIsGameActive();
+
+
 
       // toggle whose turn it is if the game is active, or set the turn to null
-      self.turn = self.gameActive ? ((self.turn === constants.PLAYER_COMPUTER) ? constants.PLAYER_HUMAN : constants.PLAYER_COMPUTER) : null;
-      self.turnSymbol  = _getSymbolForPlayer(self.turn);
+      game.turn = game.gameActive ? ((game.turn === constants.PLAYER_COMPUTER) ? constants.PLAYER_HUMAN : constants.PLAYER_COMPUTER) : null;
+      game.turnSymbol  = _getSymbolForPlayer(game.turn);
+      if(game.gameActive){
+        $rootScope.$broadcast("turn_notify", {turn: game.turn});
+      } else {
+        $rootScope.$broadcast("game_end_event", { winner: game.winner || constants.STATE_DRAW });
+        self.allGamesOutcome.push(game.winner || constants.STATE_DRAW );
+        if(game.winner === constants.PLAYER_COMPUTER){
+          self.computerWins ++;
+        } else if(game.winner === constants.PLAYER_HUMAN){
+          self.humanWins ++;
+        } else {
+          self.draws ++;
+        }
 
+      }
+
+    }
+
+
+    function init(){
+      reset();
     }
 
 
@@ -158,10 +181,13 @@
       playInSquare: playInSquare,
       init: init,
       getCurrentPlayer: function(){
-        return self.turn;
+        return game.turn;
       },
       getSquares: function(){
-        return self.squares;
+        return game.squares;
+      },
+      getGameStatus: function(){
+        return game;
       },
       getStatus: function(){
         return self;

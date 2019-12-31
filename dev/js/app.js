@@ -2,22 +2,32 @@
 
   "use strict";
 
-  angular.module("noughts", ["constants"])
+  angular.module("noughts", ["constants", "mlengine"])
+
+
 
   .config(function($httpProvider, $logProvider) {
     $httpProvider.defaults.headers.post["Content-Type"] = "application/json";
     $logProvider.debugEnabled(true);
   })
 
-  .run(function($log, GameState){
+
+
+  .run(function($log, $rootScope, GameState, ComputerPlayer){
     GameState.init();
+    ComputerPlayer.init(GameState, { startingScores: 10 });
+
+    // notify the computer that it's its turn
+    $rootScope.$broadcast("turn_notify", {turn: GameState.getGameStatus().turn});
   })
+
+
 
   .directive("ngNoughtsGameboard", function($log, $rootScope, constants, GameState){
 
     function _setBoard(scope){
-        scope.squares = GameState.getSquares();
-        scope.status = GameState.getStatus();
+      scope.squares = GameState.getSquares();
+      scope.status = GameState.getGameStatus();
     }
 
     return {
@@ -32,11 +42,11 @@
         _setBoard(scope);
         $rootScope.$on("resetgame", function(){
           _setBoard(scope);
+          $rootScope.$broadcast("turn_notify", {turn: GameState.getGameStatus().turn});
         });
 
         scope.clickSquare = function(squareId){
-          var currentPlayer = GameState.getCurrentPlayer();
-          GameState.playInSquare(currentPlayer, squareId);
+          GameState.playInSquare(constants.PLAYER_HUMAN, squareId);
         };
       }
     };
@@ -74,9 +84,11 @@
     return {
       restrict: "A",
       link: function(scope){
+        scope.game = GameState.getGameStatus();
         scope.status = GameState.getStatus();
 
-        $rootScope.$on("resetgame", function(e, params){
+        $rootScope.$on("resetgame", function(){
+          scope.game = GameState.getGameStatus();
           scope.status = GameState.getStatus();
         });
       }
@@ -103,7 +115,8 @@
   })
   .constant("constants", {
     PLAYER_HUMAN: "Human",
-    PLAYER_COMPUTER: "Computer"
+    PLAYER_COMPUTER: "Computer",
+    STATE_DRAW: "draw"
   });
 
 
