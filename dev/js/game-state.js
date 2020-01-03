@@ -51,6 +51,21 @@
     }
 
 
+    function loadPlayer(){
+      self = {
+        gameCounter: 0,
+        allGamesOutcome: [],
+        computerWins: 0,
+        humanWins: 0,
+        draws: 0
+      };
+      localStorageService.set(stateStorageId, self);
+      $rootScope.$broadcast("load_trained_player");
+      reset();
+
+    }
+
+
     function reset(){
       game = {
         turn: constants.PLAYER_COMPUTER,
@@ -217,7 +232,8 @@
         return self;
       },
       reset: reset,
-      hardReset: hardReset
+      hardReset: hardReset,
+      loadPlayer: loadPlayer
     };
   });
 

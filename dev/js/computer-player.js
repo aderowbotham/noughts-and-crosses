@@ -4,24 +4,29 @@
 
   angular.module("mlengine", ["constants"])
 
-  .factory("ComputerPlayer", function($timeout, $log, $rootScope, $window, constants, localStorageService) {
+  .factory("ComputerPlayer", function($timeout, $log, $rootScope, $window, $http, constants, localStorageService, MirrorsService) {
+
 
     var gameStateRef,
       thisGameHistory = [],
       allHistory,
-      historyStorageId;
+      historyStorageId,
+      moveNumber;
+
 
     var settings = {
-      startingMoves: 5, // equivalent to number of coloured beads per possible move in each matchbox
-      winReward: 4,
-      loseReward: -2,
+      startingBoxMoves: 4, // equivalent to number of coloured beads in the first box - we provide one less for 2nd, 3rd and 4th move boxes
+      winReward: 3,
+      loseReward: -1,
       drawReward: 1,
-      checkEquivalents: false,
+      mirrorSettings: null,
     };
+
 
     function init(_gameStateRef, _settingsOverride, gameId){
       gameStateRef = _gameStateRef;
       historyStorageId = gameId + ".allHistory";
+      moveNumber = 1;
 
       // if settings passed then overwrite the defauls
       if(_settingsOverride){
@@ -42,7 +47,9 @@
       $rootScope.$on("turn_notify", _onTurnNotify);
       $rootScope.$on("game_end_event", _onGameEnd);
       $rootScope.$on("hard_reset", _onHardReset);
+      $rootScope.$on("load_trained_player", _doLoadTrained);
       $rootScope.$on("reset_game", function(){
+        moveNumber = 1;
         thisGameHistory = [];
       });
     }
@@ -55,6 +62,29 @@
       $window.alert("Computer player reset to beginner");
     }
 
+
+    function _doLoadTrained(){
+      allHistory = {};
+      $http.get("trained.json")
+      .then(
+        function success(response){
+
+          if(!response || !response.data){
+            return $window.alert("Unexpected data, failed to load player");
+          }
+
+          allHistory = response.data;
+          localStorageService.set(historyStorageId, allHistory);
+
+          $window.alert("Trained player loaded");
+        },
+        function error(response){
+          $window.alert("Unable to load player data ");
+        }
+      );
+
+
+    }
 
     function _onGameEnd(e, params){
 
@@ -83,9 +113,9 @@
         var stateKey = move.stateKey;
         delete move.stateKey;
         delete move.positionId;
-        delete move.available;
+        // delete move.available;
         // copy to the more permanent history
-        allHistory[stateKey] = angular.copy(move);
+        allHistory[stateKey] = angular.copy(move.moveWeighting);
         localStorageService.set(historyStorageId, allHistory);
       });
 
@@ -117,8 +147,13 @@
 
 
       // - - figure out my move - -
-      var board = _getBoard(gameStatus.squares);
-      var available = _getAvailablePlaces(board);
+
+      // get flat array of all states
+      var stateArray = gameStatus.squares.map(function(square){
+        return square.val;
+      });
+
+      var available = _getAvailablePlaces(stateArray);
       var positionId;
 
       // no learning required when only one space to move into
@@ -126,62 +161,218 @@
         positionId = available[0];
       } else {
 
-        var myMoveObject = _getMoveAsObject(board, available);
+        var myMoveObject = _getMoveAsObject(stateArray, available);
+
+        // $log.debug("myMoveObject = ",myMoveObject)
 
         // catch situation where computer cannot move
+        // note this should not be possible due to reset mechanism in _getMoveAsObject()
         if(myMoveObject.positionId === null){
           return $log.warn("Computer cannot move");
         }
 
-        thisGameHistory.push(myMoveObject);
-        positionId = myMoveObject.positionId;
+        // position ID to move in
+        positionId = angular.copy(myMoveObject.positionId);
 
+        // if we are using a mirrored state we need to process it
+        // and set positionIdHistoryRef as the positionId
+        if(myMoveObject.useMirrorFromHistory){
+          myMoveObject.positionId = myMoveObject.positionIdHistoryRef;
+          delete myMoveObject.positionIdHistoryRef;
+        }
+        delete myMoveObject.useMirrorFromHistory;
+
+        thisGameHistory.push(myMoveObject);
       }
 
       gameStateRef.playInSquare(constants.PLAYER_COMPUTER, positionId);
+
+      moveNumber++;
     }
 
 
 
-    function _getMoveAsObject(board, available){
+    function _getMoveAsObject(stateArray, available){
 
-      var output = {};
+      // 1. check for exact match of statekey in allHistory
+      // 2. if no match found then get all possible unique board configurations as rotations
+      //   2a. For each rotation check for a match in allHistory
+      //   If found then:
+      //     - Get the board weighting from the history match
+      //     - Unrotate the board weighting (using the metadata linked to the matching rotation) and use this to determine the move
+      //     - *Important* - rather than store the new (unrotated) moveWeighting, at the end of the game we want to update the existing one in the history
+      // 3. Failing no match then generate a new (default) set of moveWeightings to store against the stateKey of this board
 
-      if(settings.checkEquivalents){
-        throw("checkEquivalents not implemented");
-        // for each grid rotation check if allHistory[_that_state_key_] exists
+      var i,
+      output = {},
+      mirrorFromHistory = null,
+      activeMirror = null,
+      moveWeighting = null,
+      rotationMoveWeighting = null;
+
+      output.stateKey = stateArray.join("");
+      output.useMirrorFromHistory = false;
+
+      if(allHistory[output.stateKey]){
+        moveWeighting = allHistory[output.stateKey];
+
       } else {
-        output.stateKey = board.join("");
-        if(allHistory[output.stateKey]){
-          output.moveWeighting = allHistory[output.stateKey].moveWeighting;
-        } else {
-          output.moveWeighting = _makeNewMoveWeighting(available);
-        }
-      }
 
-      output.positionId =_choosePositionFromWeighting(output.moveWeighting);
+        // look for mirrors
+        if(settings.mirrorSettings !== null){
+
+          var stateKeyMirrors = MirrorsService.getMirrors(stateArray, settings.mirrorSettings);
+
+          for(i = 0; i < stateKeyMirrors.length; i++){
+            if(allHistory[stateKeyMirrors[i].stateKey]){
+              mirrorFromHistory = allHistory[stateKeyMirrors[i].stateKey];
+              activeMirror = stateKeyMirrors[i];
+              // swap the actual stateKey with the stateKey of the matching mirror
+              output.stateKey = activeMirror.stateKey;
+              break;
+            }
+          }
+
+          if(mirrorFromHistory){
+
+            output.useMirrorFromHistory = true;
+
+            // @TODO get weighting of move in history, then apply reverse rotation / flip to get back to current stateArray
+            // then we can apply this moveWeighting to *our* stateArray
+
+            if(activeMirror.rotate || activeMirror.flip_h){
+              var stateArrayFromMoveWeightings = _convertWeightingsObjectToStateArray(mirrorFromHistory, settings.mirrorSettings.grid);
+              var unrotatedStateArray = MirrorsService.revertMirror(stateArrayFromMoveWeightings, activeMirror.rotate, activeMirror.flip_h, settings.mirrorSettings);
+
+               // add moveWeighting to *use* in our game
+               moveWeighting = _convertStateArrayToWeightingsObject(unrotatedStateArray, settings.mirrorSettings.grid);
+               // also add the moveWeighting from history which we will later need to update at the end of the game
+               rotationMoveWeighting = mirrorFromHistory;
+
+            } else {
+              $log.warn("! Found mirror in history with no transformations; this should never happen becasue it should have already been matched by allHistory[output.stateKey]");
+              moveWeighting = mirrorFromHistory;
+            }
+
+            // $log.debug("- - We have seen this state before: ", mirrorFromHistory)
+          }
+
+        }
+
+        // if no moveWeighting was found then generate a new one
+        if(!moveWeighting){
+          moveWeighting = _makeNewMoveWeighting(available);
+        }
+
+      } // end else if not found in history
+
+
+
+
+      // position to move in
+      output.positionId =_choosePositionFromWeighting(moveWeighting);
+
+      // @TODO (if using a mirrorFromHistory) also work out and store a copy of positionId in the reference of the rotation we used to make the move
 
       // if all move weightings reached zero no position would be available
       // so in this case we reset this state
       if(output.positionId === null){
         $log.warn("History for this state reached a 'no moves available' state so was reset");
-        output.moveWeighting = _makeNewMoveWeighting(available);
-        output.positionId =_choosePositionFromWeighting(output.moveWeighting);
+        // moveWeighting = _makeNewMoveWeighting(available);
+        moveWeighting = _resetMoveWeighting(moveWeighting);
+
+        // also reset the rotationMoveWeighting (if a rotation was matched in all history)
+        if(mirrorFromHistory){
+          rotationMoveWeighting = _resetMoveWeighting(rotationMoveWeighting);
+        }
+
+        output.positionId =_choosePositionFromWeighting(moveWeighting);
       }
 
-      output.available = available;
+      // set either the actual or the mirror's moveWeighting in the output
+      // as this will now only be needed for history recording purposes
+      output.moveWeighting = mirrorFromHistory ? rotationMoveWeighting : moveWeighting;
+
+      // we also need to store the ROTATED version of the positionId for the purpose of updating the weighting at the end of the game
+      // i.e. we might have moved in the top left corner but based on a moveWeighting of a rotation where that was the bottom right corner
+      // so at the end of the game for the purposes of the history it would be as if we moved in the bottom right corner this move
+      if(mirrorFromHistory){
+
+        // get rotated positionId
+        var tempStateArray = new Array(stateArray.length).fill(null);
+        tempStateArray[output.positionId] = 1;
+        tempStateArray = MirrorsService.applyMirror(tempStateArray, activeMirror.rotate, activeMirror.flip_h, settings.mirrorSettings);
+
+        // get the rotated positionId (only index in the array with a 1, rest are null)
+        for(i = 0; i < tempStateArray.length; i++){
+          if(tempStateArray[i] === 1){
+            output.positionIdHistoryRef = i;
+            break;
+          }
+        }
+
+        // new Array(stateArrayLength).fill(null);
+        // output.positionIdHistoryRef =
+      }
+
+      // @NOTE we don't need require the available array because this is encoded in the moveWeighting
+      // namely - the moveWeighting only contains keys for available positions
+      // output.available = available;
       return output;
     }
 
 
 
+    // converts the weightings object (which might have gaps) to a flat array the size of the board,
+    // with null values where there are no weightings - i.e. in the positions where it is not possible to move
+    function _convertWeightingsObjectToStateArray(moveWeightingObject, grid){
+
+      var stateArrayLength = grid[0] * grid[1];
+
+      // create blank array filled with nulls
+      var output = new Array(stateArrayLength).fill(null);
+
+      // populate array with any existing keys in the moveWeightingObject object
+      for (var key in moveWeightingObject) {
+        if (moveWeightingObject.hasOwnProperty(key)){
+          output[key] = moveWeightingObject[key];
+        }
+      }
+      return output;
+    }
+
+
+    // does the reverse of _convertWeightingsObjectToStateArray
+    function _convertStateArrayToWeightingsObject(stateArray, grid){
+      var moveWeightingObject = {};
+      for(var i = 0; i < stateArray.length; i++){
+        if(stateArray[i] !== null){
+          moveWeightingObject[i] = stateArray[i];
+        }
+      }
+      return moveWeightingObject;
+    }
+
+
     function _makeNewMoveWeighting(available){
       var output = {};
       available.forEach(function(positionId){
-        output[positionId] = settings.startingMoves;
+        output[positionId] = settings.startingBoxMoves - (moveNumber - 1);
       });
 
       return output;
+    }
+
+
+    // for a given moveWeighting, which only has keys and values for available positions,
+    // reset the weighting to the startingBoxMoves value
+    function _resetMoveWeighting(moveWeighting){
+      for (var key in moveWeighting) {
+        if (moveWeighting.hasOwnProperty(key)){
+          moveWeighting[key] = settings.startingBoxMoves - (moveNumber - 1);
+        }
+      }
+      return moveWeighting;
     }
 
 
@@ -211,7 +402,6 @@
       }
 
       $log.debug("moveWeighting = ",moveWeighting);
-      // $log.debug("allChances = ",allChances)
 
       if(!allChances.length){
         return null;
@@ -224,17 +414,10 @@
 
 
 
-    function _getBoard(squares){
-      return squares.map(function(square){
-        return square.val;
-      });
-    }
-
-
-    function _getAvailablePlaces(board){
+    function _getAvailablePlaces(stateArray){
       var available = [];
-      for(var i=0; i<board.length; i++){
-        if(board[i] === 0){
+      for(var i=0; i<stateArray.length; i++){
+        if(stateArray[i] === 0){
           available.push(i);
         }
       }

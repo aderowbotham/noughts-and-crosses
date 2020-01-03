@@ -6,11 +6,11 @@
   <meta http-equiv="x-ua-compatible" content="IE=edge">
   <meta name="description" content="Noughts and Crosses machine learning experiment">
   <meta name="author" content="Ade Rowbotham">
-  <title>Noughts and Crosses</title>
+  <title>Machine Learning Experiments - Noughts and Crosses</title>
 
   <link href="node_modules/foundation-sites/dist/css/foundation.min.css" rel="stylesheet">
   <link href="node_modules/foundation-sites/dist/css/foundation-float.css" rel="stylesheet">
-  <link href="css/noughts.css?r=7" rel="stylesheet">
+  <link href="css/noughts.css?r=8" rel="stylesheet">
 
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-188815-26"></script>
   <script>
@@ -31,7 +31,7 @@
 
         <div class="row">
           <div class="small-12 columns">
-            <h6>Noughts and Crosses</h6>
+            <h6>Machine Learning Experiments &ndash; Noughts and Crosses</h6>
           </div>
         </div>
 
@@ -43,31 +43,34 @@
           <div class="large-7 medium-6 small-12 columns">
 
             <div class="row align-middle">
-              <div class="small-6 columns">
+              <div class="small-12 columns">
                 <button class="button reset-button" type="button" ng-click="resetGame()">New game</button>
-              </div>
-              <div class="small-6 columns text-right">
-                <button class="button tiny alert hard-reset-button align-bottom" type="button" ng-click="hardResetGame()">Clear all memory</button>
               </div>
             </div>
 
             <div ng-game-status-panel class="stats-panel">
-              <div>Games {{ status.allGamesOutcome.length }} (Human {{ status.humanWins }}, Computer {{ status.computerWins }}, draw {{ status.draws }})</div>
+              <div>{{ status.allGamesOutcome.length }} Games: Human {{ status.humanWins }}, CPU {{ status.computerWins }}, draw {{ status.draws }}</div>
               <div>{{ game.gameActive ? "Game in progress" : "Game finished" }}</div>
               <div ng-show="game.gameActive">Turn: {{ game.turn }} ({{ game.turnSymbol.toUpperCase() }})</div>
               <div class="winner" ng-show="game.winner">{{ game.winner }} is the winner</div>
               <div class="winner" ng-show="!game.winner && !game.gameActive">It was a draw</div>
             </div>
 
-            <p>Inspired by <a href="https://www.mscroggs.co.uk/menace/">Matthew Scroggs’ MENACE</a>. This is my own implementation of it using the same basic principles but built from scratch as a learning exercise.</p>
-            <p><em>@TODO</em> We don't yet look for rotations or mirror images, so learning is slow.</p>
+            <p>Machine learning experiement inspired by <a href="https://www.mscroggs.co.uk/menace/" class="text-link">Matthew Scroggs’ MENACE</a>. This implementation uses very similar reinforcement principles.</p>
+
+            <div class="small-buttons">
+              <button class="button tiny success load-button align-bottom" type="button" ng-click="loadPlayer()">Load trained computer player</button>
+              <button class="button tiny alert hard-reset-button align-bottom" type="button" ng-click="hardResetGame()">Reset computer player</button>
+            </div>
+
+            <p><a href="https://github.com/aderowbotham/noughts-and-crosses" class="text-link" target="_blank">See source on GitHub</a></p>
 
           </div>
         </div>
 
         <div class="row">
           <div class="small-12 columns">
-            <p><a class="text-link" href="https://aderowbotham.com/" target="_blank">aderowbotham.com</a> | <a href="https://github.com/aderowbotham/noughts-and-crosses"  target="_blank">Source on GitHub</a></p>
+            <p><a class="text-link footer-link" href="https://aderowbotham.com/" target="_blank">aderowbotham.com</a></p>
           </div>
         </div>
 
@@ -80,9 +83,10 @@
   <script src="node_modules/angular/angular.min.js"></script>
   <script src="node_modules/angular-local-storage/dist/angular-local-storage.min.js"></script>
 
-  <script src="js/app.js?r=7"></script>
-  <script src="js/game-state.js?r=7"></script>
-  <script src="js/computer-player.js?r=7"></script>
+  <script src="js/app.js?r=8"></script>
+  <script src="js/game-state.js?r=8"></script>
+  <script src="js/computer-player.js?r=8"></script>
+  <script src="js/mirrors-service.js?r=8"></script>
 
 </body>
 </html>

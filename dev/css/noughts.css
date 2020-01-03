@@ -20,8 +20,19 @@ body
 .text-link
 {
   color: #fff;
-  margin-top: 100px;
+  text-decoration: underline;
+}
+.text-link:hover
+{
+  color: #e0e0e0;
+}
+
+
+.footer-link
+{
   display: inline-block;
+  margin-top: 100px;
+  text-decoration: none;
 }
 
 .gameboard .square
@@ -110,9 +121,15 @@ body
   color: #ff0;
 }
 
-.button.hard-reset-button
+.reset-button
 {
-  margin: 0;
+  display: inline-block;
+  margin: 40px 0 20px;
+}
+
+.small-buttons .button
+{
+  margin: 0 0 15px 0;
 }
 
 /* angular */
@@ -130,17 +147,16 @@ body
 @media screen and (max-width: 639px)  {
   body
   {
-    margin: 25px;
+    margin: 20px;
   }
 
-  .reset-button, .button.hard-reset-button
+  .game-area
   {
-    display: inline-block;
-    margin: 40px 0 20px 0;
+    margin-top: 20px;
   }
 
-  .button.hard-reset-button
+  .small-buttons
   {
-    margin-top: 53px;
+    margin: 30px 0;
   }
 }

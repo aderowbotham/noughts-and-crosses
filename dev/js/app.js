@@ -8,14 +8,18 @@
 
   .config(function($httpProvider, $logProvider) {
     $httpProvider.defaults.headers.post["Content-Type"] = "application/json";
-    $logProvider.debugEnabled(true);
+    $logProvider.debugEnabled(false);
   })
 
 
 
   .run(function($log, $rootScope, GameState, ComputerPlayer){
-    GameState.init("noughts_v1");
-    ComputerPlayer.init(GameState, { startingScores: 10 }, "noughts_v1");
+    GameState.init("noughts_v1.1");
+    ComputerPlayer.init(GameState, { mirrorSettings: {
+      grid: [3,3],
+      rotate: true,
+      flip_h: true
+    } }, "noughts_v1.1");
 
     // notify the computer that it's its turn
     $rootScope.$broadcast("turn_notify", {turn: GameState.getGameStatus().turn});
@@ -115,6 +119,21 @@
       link: function(scope){
         scope.resetGame = function(){
           GameState.reset();
+          console.clear();
+        };
+
+      }
+    };
+  })
+
+  .directive("loadButton", function($log, $window, GameState){
+    return {
+      restrict: "C",
+      link: function(scope){
+        scope.loadPlayer = function(){
+          if($window.confirm("This will load a pre-trained computer player. Are you sure you want to continue?")){
+            GameState.loadPlayer();
+          }
         };
 
       }
