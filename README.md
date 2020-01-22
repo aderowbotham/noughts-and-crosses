@@ -1,5 +1,7 @@
 # noughts-and-crosses
 
+[Play it here](https://dev.adeweb.co.uk/noughts/)
+
 ### version 1.1
 
 Uses Foundation and AngularJS
