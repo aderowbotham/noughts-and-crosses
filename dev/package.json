@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/aderowbotham/noughts-and-crosses#readme",
   "dependencies": {
-    "angular": "^1.7.9",
+    "angular": "^1.8.3",
     "angular-local-storage": "^0.7.1",
     "foundation-sites": "^6.6.1",
     "what-input": "^5.2.6"
